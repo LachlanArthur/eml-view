@@ -8,8 +8,8 @@
   "type": "module",
   "scripts": {
     "dev": "npm run build -- --watch --servedir=dist",
-    "copy-icons": "esbuild node_modules/@shoelace-style/shoelace/dist/assets/icons/*.svg --loader:.svg=copy --outdir=src/shoelace/assets/icons",
-    "build": "npm run copy-icons && esbuild src/**/* --bundle --format=esm --loader:.html=copy --loader:.ico=copy --loader:.svg=copy --sourcemap --outdir=dist"
+    "copy-icons": "esbuild \"node_modules/@shoelace-style/shoelace/dist/assets/icons/*.svg\" --loader:.svg=copy --outdir=src/shoelace/assets/icons",
+    "build": "npm run copy-icons && esbuild \"src/**/*\" --bundle --format=esm --loader:.html=copy --loader:.ico=copy --loader:.svg=copy --sourcemap --outdir=dist"
   },
   "repository": {
     "type": "git",
