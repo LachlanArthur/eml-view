@@ -17,7 +17,7 @@ Preview the contents of an email file right in your browser.
 
 ## Screenshot
 
-(I gotta upload one here)
+![firefox_2JcrZ3r44o](https://github.com/user-attachments/assets/38be4f90-0665-4fb4-8c89-b00b30f4a32c)
 
 ## Features
 
