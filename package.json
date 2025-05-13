@@ -1,0 +1,32 @@
+{
+  "name": "eml-view",
+  "private": true,
+  "version": "1.0.0",
+  "description": "A web component to view EML files",
+  "main": "eml-view.js",
+  "module": "eml-view.js",
+  "type": "module",
+  "scripts": {
+    "dev": "npm run build -- --watch --servedir=dist",
+    "copy-icons": "esbuild node_modules/@shoelace-style/shoelace/dist/assets/icons/*.svg --loader:.svg=copy --outdir=src/shoelace/assets/icons",
+    "build": "npm run copy-icons && esbuild src/**/* --bundle --format=esm --loader:.html=copy --loader:.ico=copy --loader:.svg=copy --sourcemap --outdir=dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/LachlanArthur/eml-view.git"
+  },
+  "author": "Lachlan Arthur",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LachlanArthur/eml-view/issues"
+  },
+  "homepage": "https://github.com/LachlanArthur/eml-view#readme",
+  "dependencies": {
+    "@shoelace-style/shoelace": "^2.15.0",
+    "postal-mime": "^2.2.5"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.4",
+    "typescript": "^5.2.2"
+  }
+}

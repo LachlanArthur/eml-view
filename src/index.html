@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Email</title>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" data-light="/favicon.ico" data-dark="/favicon-dark.ico" sizes="256x256 128x128 64x64 48x48 32x32 24x24 16x16" />
+    <script src="/favicon-dark.js"></script>
+
+    <script type="module" src="/shoelace/shoelace.js"></script>
+    <link rel="stylesheet" href="/shoelace/light.css">
+
+    <script type="module" src="/eml-view.js"></script>
+    <link rel="stylesheet" href="/eml-view.css">
+
+    <style>
+      *,
+      *:before,
+      *:after {
+        box-sizing: border-box;
+      }
+
+      /* Prevent flash of unloaded components */
+      :not(:defined) {
+        visibility: hidden;
+      }
+
+      body {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        font-family: var(--sl-font-sans);
+      }
+
+      input[type="file"] {
+        margin-bottom: var(--sl-spacing-medium);
+      }
+
+      .droparea {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(108, 117, 125, 0.75);
+        align-items: center;
+        justify-content: center;
+        font-size: 15vmin;
+        pointer-events: none;
+        z-index: 2000;
+        display: none;
+
+        &:not([hidden]) {
+          display: flex;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div style="float: right; display: flex">
+      <sl-icon-button name="logo" library="custom" href="https://lach.la" title="By Lachlan Arthur"></sl-icon-button>
+      <sl-icon-button name="github" href="https://github.com/LachlanArthur/eml-view" title="View source on GitHub"></sl-icon-button>
+    </div>
+
+    <h1>Preview Email</h1>
+
+    <input type="file" accept="message/rfc822">
+    <eml-view></eml-view>
+
+    <div class="droparea" hidden>Drop file</div>
+
+    <script type="module">
+      import html from '/html-template.js';
+
+      const emlView = document.querySelector('eml-view');
+      const upload = document.querySelector('input[type="file"]');
+      const droparea = document.querySelector('.droparea');
+
+      function tryFiles(files) {
+        if (!files.length) return;
+        const emlFiles = Array.from(files).filter((file) => file.type === 'message/rfc822');
+        if (emlFiles.length) {
+          loadFile(emlFiles[0]);
+        } else {
+          showError('Unknown file type');
+        }
+      }
+
+      upload.addEventListener('change', e => {
+        tryFiles(e.target.files);
+      });
+
+      window.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.dataTransfer.dropEffect = 'copy';
+        droparea.hidden = false;
+      });
+
+      window.addEventListener('dragleave', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        droparea.hidden = true;
+      });
+
+      window.addEventListener('drop', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        droparea.hidden = true;
+        if (!e.dataTransfer) return;
+        tryFiles(e.dataTransfer.files);
+      });
+
+      droparea.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        droparea.hidden = true;
+      });
+
+      function loadFile(file) {
+        emlView.src = URL.createObjectURL(file);
+      }
+
+      function showError(message) {
+        emlView.innerHTML = html`
+          <sl-alert variant="danger" open>
+            <sl-icon slot="icon" name="exclamation-octagon"></sl-icon>
+            <strong>Email preview failed</strong><br>
+            ${message}
+          </sl-alert>
+        `;
+      }
+    </script>
+
+    <script type="module">
+      import { registerIconLibrary } from '/shoelace/shoelace.js';
+
+      registerIconLibrary( 'custom', {
+        resolver: name => `/icons/${name}.svg`,
+        mutator: svg => svg.setAttribute( 'fill', 'currentColor' )
+      } );
+    </script>
+  </body>
+</html>

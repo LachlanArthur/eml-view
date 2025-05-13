@@ -1,0 +1,273 @@
+eml-view {
+	display: block;
+	font-family: var(--sl-font-sans);
+
+	> sl-card {
+		display: block;
+		--border-radius: var(--sl-border-radius-large);
+
+		&::part(footer) {
+			padding: 0;
+		}
+
+		> [slot='footer'] {
+			&,
+			iframe {
+				border-bottom-left-radius: calc(var(--border-radius) - 1px);
+				border-bottom-right-radius: calc(var(--border-radius) - 1px);
+			}
+		}
+	}
+
+	header {
+		display: grid;
+		grid-template-areas:
+			"avatar info actions"
+		;
+		grid-template-columns: min-content 1fr;
+		margin-bottom: var(--sl-spacing-small);
+		color: var(--sl-color-neutral-600);
+
+		sl-avatar { grid-area: avatar; }
+		.eml-info { grid-area: info; }
+		aside { grid-area: actions; }
+
+		sl-avatar {
+			margin-right: var(--sl-spacing-x-small);
+		}
+
+		aside {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-end;
+			gap: var(--sl-spacing-x-small);
+		}
+
+		.eml-date {
+			font-size: var(--sl-font-size-small);
+			display: flex;
+			align-items: center;
+			height: 1.2rem;
+
+			sl-divider {
+				--spacing: var(--sl-spacing-small);
+			}
+		}
+
+		details {
+			display: contents;
+
+			summary {
+				display: inline list-item;
+				font-size: var(--sl-font-size-small);
+				color: var(--sl-color-neutral-500);
+				cursor: pointer;
+			}
+
+			dl {
+				margin: 0;
+				display: grid;
+				grid-template-columns: max-content auto;
+				gap: 0 var(--sl-spacing-x-small);
+
+				dt {
+					&::after {
+						content: ':';
+					}
+				}
+
+				dd {
+					margin: 0;
+				}
+			}
+		}
+	}
+
+	h1 {
+		font-size: var(--sl-font-size-x-large);
+		font-weight: var(--sl-font-weight-normal);
+		margin: var(--sl-spacing-small) 0;
+	}
+
+	sl-tab-panel {
+		&::part(base) {
+			padding: 0;
+		}
+	}
+
+	iframe {
+		display: block;
+		width: 100%;
+		min-height: 500px;
+		border: none;
+	}
+
+	pre {
+		text-wrap-mode: wrap;
+		white-space-collapse: preserve;
+		font-family: var(--sl-font-mono);
+		margin: 0;
+		padding: var(--sl-spacing-medium) var(--sl-spacing-large);
+	}
+
+	sl-dialog.eml-dialog-headers {
+		&::part(body) {
+			padding-top: 0;
+		}
+
+		table {
+			border-collapse: collapse;
+			width: 100%;
+			vertical-align: top;
+			font-size: var(--sl-font-size-small);
+			word-break: break-word;
+
+			thead, tbody, tr, th, td {
+				text-align: inherit;
+				vertical-align: inherit;
+			}
+
+			thead {
+				vertical-align: bottom;
+
+				th:first-child {
+					min-width: 150px;
+				}
+			}
+
+			> :not(caption) > * > * {
+				border-bottom: solid 1px var(--sl-color-neutral-200);
+				padding: var(--sl-spacing-2x-small);
+			}
+		}
+	}
+
+	a.eml-emailaddress {
+		color: var(--sl-color-primary-600);
+
+		&:not(:focus, :hover) {
+			text-decoration: none;
+
+			&:has(.eml-emailaddress-name) .eml-emailaddress-address {
+				color: var(--sl-color-neutral-400);
+			}
+		}
+
+		&:has(.eml-emailaddress-name) .eml-emailaddress-address {
+			&::before { content: '<' }
+			&::after { content: '>' }
+
+			font-size: var(--sl-font-size-small);
+		}
+	}
+
+	.eml-attachments {
+		--gap: var(--sl-spacing-medium);
+		columns: 250px;
+		column-gap: var(--gap);
+	}
+
+	.eml-attachment {
+		border: 1px solid var(--sl-color-neutral-300);
+		border-radius: var(--sl-border-radius-medium);
+		display: grid;
+		grid-template-areas:
+			"thumb"
+			"info "
+		;
+		grid-template-rows: min-content min-content;
+		overflow: clip;
+		color: var(--sl-color-neutral-600);
+		text-decoration: none;
+		margin-bottom: var(--gap);
+		break-inside: avoid-column;
+
+		img {
+			grid-area: thumb;
+			display: grid;
+			width: 100%;
+			height: auto;
+			aspect-ratio: 2/1;
+			object-fit: scale-down;
+			padding: var(--sl-spacing-x-small);
+			border-bottom: 1px solid var(--sl-color-neutral-300);
+		}
+
+		.eml-attachment-info {
+			grid-area: info;
+			background-color: var(--sl-color-neutral-100);
+			padding: var(--sl-spacing-x-small) var(--sl-spacing-small);
+			display: flex;
+		}
+
+		sl-icon {
+			font-size: var(--sl-font-size-x-large);
+			margin-right: var(--sl-spacing-small);
+			margin-top: var(--sl-spacing-2x-small);
+			flex-shrink: 0;
+		}
+
+		.eml-attachment-info-text {
+			flex-grow: 1;
+			font-size: var(--sl-font-size-x-small);
+		}
+
+		.eml-attachment-filename {
+			font-weight: var(--sl-font-weight-bold);
+			word-break: break-word;
+		}
+
+		&:where(:hover, :focus):not(:has(sl-icon-button:hover)) .eml-attachment-filename {
+			text-decoration: underline;
+		}
+
+		sl-icon-button {
+			margin-left: var(--sl-spacing-small);
+		}
+	}
+
+	.eml-attachments + .eml-inline-attachments {
+		margin-top: var(--sl-spacing-medium);
+	}
+
+	.eml-inline-attachments {
+		summary {
+			display: inline;
+			cursor: pointer;
+			color: var(--sl-color-neutral-600);
+
+			&:hover, &:focus {
+				text-decoration: underline;
+			}
+		}
+
+		&[open] > summary {
+			display: none;
+		}
+	}
+
+	sl-dialog.eml-dialog-preview {
+		&::part(body) {
+			padding-top: 0;
+			height: 100vh;
+		}
+	}
+
+	.eml-dialog-preview-content {
+		height: 100%;
+
+		> * {
+			width: 100%;
+			min-height: 100%;
+			object-fit: scale-down;
+		}
+
+		> video {
+			background-color: black;
+		}
+
+		> eml-view {
+			margin-bottom: var(--body-spacing);
+		}
+	}
+}
