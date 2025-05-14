@@ -13,10 +13,11 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
+    "allowArbitraryExtensions": true,
 
     /* Linting */
     "strict": true,
     "noFallthroughCasesInSwitch": true,
   },
-  "include": ["src"],
+  "include": ["eml-view.ts", "html-template.ts"],
 }

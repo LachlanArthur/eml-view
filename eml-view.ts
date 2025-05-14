@@ -1,3 +1,4 @@
+import styles from './eml-view.css';
 import PostalMime from 'postal-mime';
 import html from './html-template.ts';
 
@@ -31,8 +32,21 @@ export default class EmlView extends HTMLElement {
 	// TODO: abort the previous render instead of skipping the new one
 	#rendering = false;
 
+	static #cssLoaded = false;
+	static async #loadCss() {
+		if ( this.#cssLoaded ) {
+			return;
+		}
+
+		const css = new CSSStyleSheet();
+		css.replaceSync( styles );
+
+		document.adoptedStyleSheets = [ ...document.adoptedStyleSheets, css ];
+	}
+
 	connectedCallback() {
 		this.#render();
+		EmlView.#loadCss();
 	}
 
 	disconnectedCallback() {
@@ -254,7 +268,7 @@ export default class EmlView extends HTMLElement {
 			for ( const attachment of eml.attachments ) {
 				this.#downloadUrl(
 					this.#makeBlobUrl( [ attachment.content ], attachment.mimeType ),
-					attachment.filename,
+					attachment.filename!,
 				);
 			}
 		} );
@@ -329,22 +343,22 @@ export default class EmlView extends HTMLElement {
 
 	#attachmentTemplate( attachment: Attachment ) {
 		const isImage = attachment.mimeType.startsWith( 'image/' );
-		const iconName = getfileIcon( attachment.mimeType, attachment.filename );
+		const iconName = getfileIcon( attachment.mimeType, attachment.filename! );
 		const blobUrl = this.#makeBlobUrl( [ attachment.content ], attachment.mimeType );
 
 		return html`
-			<a href="${blobUrl}" class="eml-attachment" data-mime="${attachment.mimeType}" data-filename="${attachment.filename}">
+			<a href="${blobUrl}" class="eml-attachment" data-mime="${attachment.mimeType}" data-filename="${attachment.filename!}">
 				${isImage ? html`
-					<img src="${blobUrl}" alt="${attachment.filename}">
+					<img src="${blobUrl}" alt="${attachment.filename!}">
 				` : null}
 				<div class="eml-attachment-info">
 					<sl-icon slot="prefix" name="${iconName}"></sl-icon>
 					<div class="eml-attachment-info-text">
-						<span class="eml-attachment-filename">${attachment.filename}</span><br>
-						<sl-format-bytes value="${attachment.content.byteLength.toString()}" display="narrow"></sl-format-bytes>
+						<span class="eml-attachment-filename">${attachment.filename!}</span><br>
+						<sl-format-bytes value="${(<ArrayBuffer>attachment.content).byteLength.toString()}" display="narrow"></sl-format-bytes>
 					</div>
 					<sl-icon-button name="download" label="Download"
-						href="${blobUrl}" download="${attachment.filename}"></sl-icon-button>
+						href="${blobUrl}" download="${attachment.filename!}"></sl-icon-button>
 				</div>
 			</a>
 		`;
@@ -432,7 +446,7 @@ export default class EmlView extends HTMLElement {
 						return att.contentId === `<${cid}>`
 					} else {
 						// Apparently some old email clients use a filename instead
-						return att.filename === cid;
+						return att.filename! === cid;
 					}
 				} );
 
@@ -441,7 +455,7 @@ export default class EmlView extends HTMLElement {
 				if ( attachmentIndex >= 0 ) {
 					const attachment = attachments[ attachmentIndex ];
 
-					newSrc = this.#makeBase64Url( attachment.content, attachment.mimeType );
+					newSrc = this.#makeBase64Url( <ArrayBuffer>attachment.content, attachment.mimeType );
 				}
 
 				return `${element}${quote}${newSrc}${quote}`;

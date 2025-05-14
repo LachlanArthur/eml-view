@@ -5,14 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Preview Email</title>
 
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" data-light="/favicon.ico" data-dark="/favicon-dark.ico" sizes="256x256 128x128 64x64 48x48 32x32 24x24 16x16" />
-    <script src="/favicon-dark.js"></script>
-
-    <script type="module" src="/shoelace/shoelace.js"></script>
-    <link rel="stylesheet" href="/shoelace/light.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.1/cdn/themes/light.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.1/cdn/shoelace-autoloader.js"></script>
 
     <script type="module" src="/eml-view.js"></script>
-    <link rel="stylesheet" href="/eml-view.css">
 
     <style>
       *,
@@ -58,11 +54,6 @@
     </style>
   </head>
   <body>
-    <div style="float: right; display: flex">
-      <sl-icon-button name="logo" library="custom" href="https://lach.la" title="By Lachlan Arthur"></sl-icon-button>
-      <sl-icon-button name="github" href="https://github.com/LachlanArthur/eml-view" title="View source on GitHub"></sl-icon-button>
-    </div>
-
     <h1>Preview Email</h1>
 
     <input type="file" accept="message/rfc822">
@@ -71,8 +62,6 @@
     <div class="droparea" hidden>Drop file</div>
 
     <script type="module">
-      import html from '/html-template.js';
-
       const emlView = document.querySelector('eml-view');
       const upload = document.querySelector('input[type="file"]');
       const droparea = document.querySelector('.droparea');
@@ -123,7 +112,7 @@
       }
 
       function showError(message) {
-        emlView.innerHTML = html`
+        emlView.innerHTML = `
           <sl-alert variant="danger" open>
             <sl-icon slot="icon" name="exclamation-octagon"></sl-icon>
             <strong>Email preview failed</strong><br>
@@ -131,15 +120,6 @@
           </sl-alert>
         `;
       }
-    </script>
-
-    <script type="module">
-      import { registerIconLibrary } from '/shoelace/shoelace.js';
-
-      registerIconLibrary( 'custom', {
-        resolver: name => `/icons/${name}.svg`,
-        mutator: svg => svg.setAttribute( 'fill', 'currentColor' )
-      } );
     </script>
   </body>
 </html>

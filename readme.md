@@ -4,6 +4,18 @@
 
 Preview the contents of an email file right in your browser.
 
+## Installation
+
+```sh
+npm install jsr:@lachlanarthur/eml-view
+```
+
+```js
+import 'jsr:@lachlanarthur/eml-view';
+```
+
+[Install Shoelace](https://shoelace.style/getting-started/installation)
+
 ## Usage
 
 ```html

@@ -1,0 +1,11 @@
+{
+  "name": "@lachlanarthur/eml-view",
+  "version": "1.0.0",
+  "license": "MIT",
+  "exports": "./eml-view.ts",
+  "publish": {
+    "include": [
+      "eml-view.ts"
+    ]
+  }
+}

@@ -7,9 +7,8 @@
   "module": "eml-view.js",
   "type": "module",
   "scripts": {
-    "dev": "npm run build -- --watch --servedir=dist",
-    "copy-icons": "esbuild \"node_modules/@shoelace-style/shoelace/dist/assets/icons/*.svg\" --loader:.svg=copy --outdir=src/shoelace/assets/icons",
-    "build": "npm run copy-icons && esbuild \"src/**/*\" --bundle --format=esm --loader:.html=copy --loader:.ico=copy --loader:.svg=copy --sourcemap --outdir=dist"
+    "dev": "npm run build -- --watch --outdir=test --servedir=test",
+    "build": "esbuild eml-view.ts --bundle --minify --format=esm --sourcemap --loader:.css=text --outdir=dist"
   },
   "repository": {
     "type": "git",
@@ -22,11 +21,11 @@
   },
   "homepage": "https://github.com/LachlanArthur/eml-view#readme",
   "dependencies": {
-    "@shoelace-style/shoelace": "^2.15.0",
-    "postal-mime": "^2.2.5"
+    "postal-mime": "^2.4.3"
   },
   "devDependencies": {
-    "esbuild": "0.25.4",
-    "typescript": "^5.2.2"
+    "@shoelace-style/shoelace": "^2.20.1",
+    "esbuild": "^0.25.4",
+    "typescript": "^5.8.3"
   }
 }
