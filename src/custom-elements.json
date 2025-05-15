@@ -1,0 +1,60 @@
+{
+	"schemaVersion": "1.0.0",
+	"readme": "",
+	"modules": [
+		{
+			"kind": "javascript-module",
+			"path": "eml-view.js",
+			"declarations": [
+				{
+					"kind": "class",
+					"customElement": true,
+					"name": "EmlView",
+					"tagName": "eml-view",
+					"description": "",
+					"members": [
+						{
+							"kind": "field",
+							"name": "src",
+							"type": {
+								"text": "string"
+							},
+							"description": "The path to the EML file to load.",
+							"attribute": "src"
+						}
+					],
+					"attributes": [
+						{
+							"name": "src",
+							"type": {
+								"text": "string"
+							},
+							"description": "The path to the EML file to load.",
+							"fieldName": "src"
+						}
+					],
+					"superclass": {
+						"name": "HTMLElement"
+					}
+				}
+			],
+			"exports": [
+				{
+					"kind": "js",
+					"name": "default",
+					"declaration": {
+						"name": "EmlView",
+						"module": "eml-view.js"
+					}
+				},
+				{
+					"kind": "custom-element-definition",
+					"name": "eml-view",
+					"declaration": {
+						"name": "EmlView"
+					}
+				}
+			]
+		}
+	]
+}

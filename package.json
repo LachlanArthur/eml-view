@@ -1,0 +1,47 @@
+{
+  "name": "eml-view",
+  "description": "A web component to view EML files",
+  "version": "1.0.0",
+  "homepage": "https://github.com/LachlanArthur/eml-view",
+  "author": "Lachlan Arthur",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/eml-view.js",
+  "module": "dist/eml-view.js",
+  "types": "dist/eml-view.d.ts",
+  "customElements": "dist/custom-elements.json",
+  "jsdelivr": "./dist/eml-view.js",
+  "exports": {
+    ".": {
+      "types": "./dist/eml-view.d.ts",
+      "import": "./dist/eml-view.js"
+    },
+    "./dist/eml-view.css": "./dist/eml-view.css",
+    "./dist/custom-elements.json": "./dist/custom-elements.json"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "dev": "npm run build -- --watch --outdir=test --servedir=test",
+    "build": "esbuild src/eml-view.ts src/eml-view.css src/custom-elements.json --bundle --minify --format=esm --loader:.json=copy --sourcemap --outdir=dist",
+    "build-types": "tsc",
+    "package": "npm run build-types && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LachlanArthur/eml-view.git"
+  },
+  "bugs": {
+    "url": "https://github.com/LachlanArthur/eml-view/issues"
+  },
+  "dependencies": {
+    "@shoelace-style/shoelace": "^2.15.0",
+    "postal-mime": "^2.2.5"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.4",
+    "typescript": "^5.2.2"
+  }
+}
