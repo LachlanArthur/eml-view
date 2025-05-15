@@ -4,7 +4,18 @@
 
 Preview the contents of an email file right in your browser.
 
-## Installation
+## Installation with a CDN
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/eml-view@1.0.0/dist/eml-view.css">
+<script type="module" src="https://cdn.jsdelivr.net/npm/eml-view@1.0.0/dist/eml-view.js"></script>
+
+<!-- Don't forget to include Shoelace -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.1/cdn/themes/light.css">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.1/cdn/shoelace-autoloader.js"></script>
+```
+
+## Installation with a bundler
 
 ```sh
 npm install eml-view
