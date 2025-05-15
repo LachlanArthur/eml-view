@@ -37,10 +37,10 @@
     "url": "https://github.com/LachlanArthur/eml-view/issues"
   },
   "dependencies": {
-    "@shoelace-style/shoelace": "^2.15.0",
     "postal-mime": "^2.2.5"
   },
   "devDependencies": {
+    "@shoelace-style/shoelace": "^2.20.1",
     "esbuild": "0.25.4",
     "typescript": "^5.2.2"
   }
