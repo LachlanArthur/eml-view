@@ -1,7 +1,7 @@
 {
   "name": "eml-view",
   "description": "A web component to view EML files",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "https://github.com/LachlanArthur/eml-view",
   "author": "Lachlan Arthur",
   "license": "MIT",
