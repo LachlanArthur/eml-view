@@ -2,7 +2,7 @@ import PostalMime from 'postal-mime';
 import html from './html-template';
 
 import type { Address, Attachment, Email } from 'postal-mime';
-import type { SlDialog, SlIconButton, SlMenuItem } from '@shoelace-style/shoelace';
+import type { SlDialog, SlDropdown, SlIconButton } from '@shoelace-style/shoelace';
 import type { TrustedString } from './html-template';
 
 export default class EmlView extends HTMLElement {
@@ -32,6 +32,7 @@ export default class EmlView extends HTMLElement {
 	#rendering = false;
 
 	connectedCallback(): void {
+		this.getSlotted();
 		this.#render();
 	}
 
@@ -45,6 +46,31 @@ export default class EmlView extends HTMLElement {
 			case 'src':
 				this.src = newValue;
 				break;
+		}
+	}
+
+	#slotted: Record<string, Node[]> = {};
+
+	getSlotted(): void {
+		for ( const child of this.children ) {
+			const { slot } = child;
+			if ( slot ) {
+				child.removeAttribute( 'slot' );
+				this.#slotted[ slot ] ??= [];
+				this.#slotted[ slot ].push( child );
+			}
+		}
+	}
+
+	injectSlotted() {
+		for ( const [ slot, children ] of Object.entries( this.#slotted ) ) {
+			const slotElement = this.querySelector( `slot[name="${slot}"]` );
+
+			if ( !slotElement ) {
+				continue;
+			}
+
+			slotElement.replaceWith( ...children );
 		}
 	}
 
@@ -71,6 +97,8 @@ export default class EmlView extends HTMLElement {
 			}
 
 			await this.#renderTemplate( await response.arrayBuffer() );
+
+			this.injectSlotted();
 		} catch ( error ) {
 			console.error( error );
 			this.#renderErrorTemplate( error );
@@ -79,16 +107,22 @@ export default class EmlView extends HTMLElement {
 		}
 	}
 
+	#eml: Email | undefined;
+
+	get eml(): Email | undefined {
+		return this.#eml;
+	}
+
 	async #renderTemplate( emlBytes: ArrayBufferLike ): Promise<void> {
-		const eml = await new PostalMime().parse( emlBytes );
+		this.#eml = await new PostalMime().parse( emlBytes );
 
-		eml.subject ??= '(No subject)';
-		eml.from ??= { name: 'undisclosed sender' };
-		eml.to ??= [ { name: 'undisclosed recipients' } ];
-		eml.attachments.forEach( attachment => attachment.filename ??= 'unnamed attachment' );
-		eml.html = this.#fixupHtml( eml );
+		this.#eml.subject ??= '(No subject)';
+		this.#eml.from ??= { name: 'undisclosed sender' };
+		this.#eml.to ??= [ { name: 'undisclosed recipients' } ];
+		this.#eml.attachments.forEach( attachment => attachment.filename ??= 'unnamed attachment' );
+		this.#eml.html = this.#fixupHtml( this.#eml );
 
-		const emlDownloadUrl = this.#makeBlobUrl( [ emlBytes ], 'message/rfc822', `${eml.subject}.eml` );
+		const emlDownloadUrl = this.#makeBlobUrl( [ emlBytes ], 'message/rfc822', `${this.#eml.subject}.eml` );
 
 		function renderMailto( addresses: Address | Address[] ): TrustedString[] {
 			if ( !Array.isArray( addresses ) ) {
@@ -121,9 +155,9 @@ export default class EmlView extends HTMLElement {
 		const details = [];
 
 		const detailEmailAddresses: [ string, Address[]?][] = [
-			[ 'Reply-To', eml.replyTo ],
-			[ 'CC', eml.cc ],
-			[ 'BCC', eml.bcc ],
+			[ 'Reply-To', this.#eml.replyTo ],
+			[ 'CC', this.#eml.cc ],
+			[ 'BCC', this.#eml.bcc ],
 		]
 
 		for ( const [ label, values ] of detailEmailAddresses ) {
@@ -132,15 +166,15 @@ export default class EmlView extends HTMLElement {
 			}
 		}
 
-		if ( eml.date ) {
+		if ( this.#eml.date ) {
 			details.push( html`
 				<dt>Date</dt>
-				<dd><sl-format-date date="${eml.date}" year="numeric" month="numeric" day="numeric" hour="numeric" minute="numeric" second="numeric"></sl-format-date></dd>
+				<dd><sl-format-date date="${this.#eml.date}" year="numeric" month="numeric" day="numeric" hour="numeric" minute="numeric" second="numeric"></sl-format-date></dd>
 			` );
 		}
 
-		const emlHtmlContent = eml.html;
-		const emlTextContent = eml.text;
+		const emlHtmlContent = this.#eml.html;
+		const emlTextContent = this.#eml.text;
 
 		const onlyHtml = emlHtmlContent !== undefined && emlTextContent === undefined;
 		const onlyText = emlTextContent !== undefined && emlHtmlContent === undefined;
@@ -159,10 +193,10 @@ export default class EmlView extends HTMLElement {
 		`;
 		const textViewer = ( content: string ) => html`<pre>${content}</pre>`;
 
-		const fromInitials = eml.from.name.split( ' ', 2 ).map( ( word ) => word[ 0 ] ).join( '' );
+		const fromInitials = this.#eml.from.name.split( ' ', 2 ).map( ( word ) => word[ 0 ] ).join( '' );
 
-		const attachments = eml.attachments.filter( att => att.disposition !== 'inline' );
-		const inlineAttachments = eml.attachments.filter( att => att.disposition === 'inline' );
+		const attachments = this.#eml.attachments.filter( att => att.disposition !== 'inline' );
+		const inlineAttachments = this.#eml.attachments.filter( att => att.disposition === 'inline' );
 
 		const output = html`
 			<sl-card>
@@ -170,8 +204,8 @@ export default class EmlView extends HTMLElement {
 					<sl-avatar initials="${fromInitials}" label="Avatar with initials: ${fromInitials}"></sl-avatar>
 
 					<div class="eml-info">
-						${renderMailto( eml.from )}<br>
-						To: ${renderMailto( eml.to )}
+						${renderMailto( this.#eml.from )}<br>
+						To: ${renderMailto( this.#eml.to )}
 						<details>
 							<summary>Show details</summary>
 							<dl>${details}</dl>
@@ -180,23 +214,23 @@ export default class EmlView extends HTMLElement {
 
 					<aside>
 						<div class="eml-date">
-							<sl-format-date date="${eml.date}" month="long" day="numeric" year="numeric"></sl-format-date>
+							<sl-format-date date="${this.#eml.date}" month="long" day="numeric" year="numeric"></sl-format-date>
 							<sl-divider vertical></sl-divider>
-							<sl-relative-time date="${eml.date}"></sl-relative-time>
+							<sl-relative-time date="${this.#eml.date}"></sl-relative-time>
 						</div>
 
-						<sl-dropdown placement="bottom-end">
+						<sl-dropdown name="actions" placement="bottom-end">
 							<sl-button slot="trigger" size="small" caret>Actions</sl-button>
 							<sl-menu>
 								<sl-menu-item value="download-eml">
 									Download email
 									<sl-icon slot="prefix" name="envelope-arrow-down"></sl-icon>
 								</sl-menu-item>
-								${eml.attachments.length > 0 ? html`
+								${this.#eml.attachments.length > 0 ? html`
 									<sl-menu-item value="download-attachments">
 										Download all attachments
 										<sl-icon slot="prefix" name="paperclip"></sl-icon>
-										<sl-badge slot="suffix" variant="neutral" pill>${String( eml.attachments.length )}</sl-badge>
+										<sl-badge slot="suffix" variant="neutral" pill>${String( this.#eml.attachments.length )}</sl-badge>
 									</sl-menu-item>
 								` : null}
 								<sl-divider></sl-divider>
@@ -204,12 +238,13 @@ export default class EmlView extends HTMLElement {
 									View headers
 									<sl-icon slot="prefix" name="table"></sl-icon>
 								</sl-menu-item>
+								<slot name="action-menu-item"></slot>
 							</sl-menu>
 						</sl-dropdown>
 					</aside>
 				</header>
 
-				<h1>${eml.subject}</h1>
+				<h1>${this.#eml.subject}</h1>
 
 				<div class="eml-attachments">${attachments.map( a => this.#attachmentTemplate( a ) )}</div>
 
@@ -243,23 +278,44 @@ export default class EmlView extends HTMLElement {
 
 		this.innerHTML = output;
 
-		this.querySelector<SlMenuItem>( 'sl-menu-item[value="download-eml"]' )?.addEventListener( 'click', () => {
-			this.#downloadUrl( emlDownloadUrl, `${eml.subject}.eml` );
-		} );
+		this.querySelector<SlDropdown>( 'sl-dropdown[name="actions"]' )?.addEventListener( 'sl-select', event => {
+			const item = event.detail.item;
+			const eml = this.#eml;
 
-		this.querySelector<SlMenuItem>( 'sl-menu-item[value="download-attachments"]' )?.addEventListener( 'click', () => {
-			for ( const attachment of eml.attachments ) {
-				this.#downloadUrl(
-					this.#makeBlobUrl( [ attachment.content ], attachment.mimeType, attachment.filename! ),
-					attachment.filename!,
-				);
+			if ( !item || !eml ) {
+				return;
 			}
-		} );
 
-		this.querySelector<SlMenuItem>( 'sl-menu-item[value="view-headers"]' )?.addEventListener( 'click', () => {
-			const dialog = this.querySelector<SlDialog>( 'sl-dialog.eml-dialog-headers' )!;
-			dialog.innerHTML = this.#headerTableTemplate( eml );
-			dialog.show();
+			switch ( item.value ) {
+				case 'download-eml':
+					this.#downloadUrl( emlDownloadUrl, `${eml.subject}.eml` );
+					break;
+
+				case 'download-attachments':
+					for ( const attachment of eml.attachments ) {
+						this.#downloadUrl(
+							this.#makeBlobUrl( [ attachment.content ], attachment.mimeType, attachment.filename! ),
+							attachment.filename!,
+						);
+					}
+					break;
+
+				case 'view-headers':
+					const dialog = this.querySelector<SlDialog>( 'sl-dialog.eml-dialog-headers' )!;
+					dialog.innerHTML = this.#headerTableTemplate( eml );
+					dialog.show();
+					break;
+
+				default:
+					this.dispatchEvent( new CustomEvent( 'eml-action', {
+						bubbles: true,
+						detail: {
+							action: item.value,
+							eml,
+						},
+					} ) );
+					break;
+			}
 		} );
 
 		this.querySelectorAll<HTMLAnchorElement>( '.eml-attachment' )

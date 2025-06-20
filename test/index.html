@@ -58,7 +58,12 @@
     <h1>Preview Email</h1>
 
     <input type="file" accept="message/rfc822">
-    <eml-view></eml-view>
+    <eml-view>
+      <sl-menu-item slot="action-menu-item" value="test">
+        Test
+        <sl-icon slot="prefix" name="emoji-sunglasses"></sl-icon>
+      </sl-menu-item>
+    </eml-view>
 
     <div class="droparea" hidden>Drop file</div>
 
@@ -121,6 +126,16 @@
           </sl-alert>
         `;
       }
+
+      document.addEventListener('eml-action', event => {
+        const { eml, action } = event.detail;
+
+        switch (action) {
+          case 'test':
+            alert('The email subject is: ' + eml.subject);
+            break;
+        }
+      });
     </script>
   </body>
 </html>

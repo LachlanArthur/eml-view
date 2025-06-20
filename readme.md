@@ -51,6 +51,31 @@ import 'eml-view/dist/eml-view.css';
 - View the full headers
 - Download all attachments with a single click
 
+## Customisation
+
+Add custom actions:
+
+```html
+<eml-view>
+  <sl-menu-item slot="action-menu-item" value="test">
+    Test
+    <sl-icon slot="prefix" name="emoji-sunglasses"></sl-icon>
+  </sl-menu-item>
+</eml-view>
+```
+
+```js
+document.addEventListener('eml-action', event => {
+  const { eml, action } = event.detail;
+
+  switch (action) {
+    case 'test':
+      alert('The email subject is: ' + eml.subject);
+      break;
+  }
+});
+```
+
 ## Uses
 
 - [postal-mime](https://github.com/postalsys/postal-mime) to parse the email files
